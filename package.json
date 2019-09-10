@@ -1,6 +1,6 @@
 {
   "name": "@rusts/arrayvec",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Rust ArrayVec type for Javascript",
   "keywords": [],
   "main": "dist/arrayvec.umd.js",
@@ -72,8 +72,7 @@
       "src/*.{js,ts}"
     ]
   },
-  "prettier": {
-  },
+  "prettier": {},
   "commitlint": {
     "extends": [
       "@commitlint/config-conventional"
