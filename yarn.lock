@@ -1025,10 +1025,10 @@
     once "^1.4.0"
     universal-user-agent "^4.0.0"
 
-"@rusts/std@^0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@rusts/std/-/std-0.0.1.tgz#e58174a3e716144c29a903b864d99fab3c9ddaa5"
-  integrity sha512-nPUVZeEYK4BBdxeGH2OMmA+jBq1i18pATmPLyYYVMh3tUhH1p6wdFZwJCe/uheeQQOVtjX86Bm7dzXQ/sUJoUQ==
+"@rusts/std@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@rusts/std/-/std-0.1.0.tgz#824b61b31a5253b567798edbcac18097cfd5834f"
+  integrity sha512-FNQnkDDc6zzpdYA4RpIP/+KfOxnNsoIomIqlEk85w9gOVuUhz+1KQVBoBHr3D3mVCaa2Ap1RJsCwEtT6e9yBOA==
 
 "@samverschueren/stream-to-observable@^0.3.0":
   version "0.3.0"

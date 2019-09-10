@@ -1,7 +1,5 @@
 import { Option, Result } from "@rusts/std";
 
-export const CAPACITY_ERROR = "CapacityError: insufficient capacity";
-
 export class ArrayVec<T> {
   private _xs: T[];
   private _capacity: number;
@@ -11,10 +9,6 @@ export class ArrayVec<T> {
     this._xs = [];
     this._capacity = capacity;
     this._len = 0;
-  }
-
-  [Symbol.iterator](): ArrayVecIter<T> {
-    return this.iter();
   }
 
   len(): number {
@@ -36,6 +30,10 @@ export class ArrayVec<T> {
     return new ArrayVecIter(this);
   }
 
+  [Symbol.iterator](): ArrayVecIter<T> {
+    return this.iter();
+  }
+
   sort<F extends (a: T, b: T) => number>(compare: F) {
     return this._xs.sort(compare);
   }
@@ -48,12 +46,12 @@ export class ArrayVec<T> {
     this.try_push(element).unwrap();
   }
 
-  try_push(element: T): Result<void, T> {
+  try_push(element: T): Result<void, CapacityError<T>> {
     if (this.len() < this.capacity()) {
       this.push_unchecked(element);
       return Result.Ok(undefined);
     } else {
-      return Result.Err(CAPACITY_ERROR, element);
+      return Result.Err(new CapacityError(element));
     }
   }
 
@@ -67,12 +65,12 @@ export class ArrayVec<T> {
     this.try_insert(index, element).unwrap();
   }
 
-  try_insert(index: number, element: T): Result<void, T> {
+  try_insert(index: number, element: T): Result<void, CapacityError<T>> {
     if (index > this.len() || index < 0) {
       panic_oob("try_insert", index, this.len());
     }
     if (this.len() === this.capacity()) {
-      return Result.Err(CAPACITY_ERROR, element);
+      return Result.Err(new CapacityError(element));
     }
     let len = this.len();
 
@@ -91,9 +89,10 @@ export class ArrayVec<T> {
     return Option.Some(this._xs.pop() as T);
   }
 
-  async swap_remove(index: number): Promise<T | void> {
-    return this.swap_pop(index).unwrapOrElse(async () => {
+  swap_remove(index: number): T {
+    return this.swap_pop(index).unwrap_or_else(() => {
       panic_oob("swap_remove", index, this.len());
+      return (undefined as unknown) as T;
     });
   }
 
@@ -106,9 +105,10 @@ export class ArrayVec<T> {
     return this.pop();
   }
 
-  async remove(index: number): Promise<T | void> {
-    return await this.pop_at(index).unwrapOrElse(async () => {
+  remove(index: number): T {
+    return this.pop_at(index).unwrap_or_else(() => {
       panic_oob("remove", index, this.len());
+      return (undefined as unknown) as T;
     });
   }
 
@@ -127,7 +127,7 @@ export class ArrayVec<T> {
   }
 
   clear() {
-    while (this.pop().isSome()) {}
+    while (this.pop().is_some()) {}
   }
 
   retain<F extends (element: T) => boolean>(f: F) {
@@ -167,10 +167,7 @@ export class ArrayVec<T> {
 
   into_inner(): Result<T[], ArrayVec<T>> {
     if (this.len() < this.capacity()) {
-      return Result.Err(
-        `ArrayVec.into_inner: length ${this.len()} is less than capacity ${this.capacity()}`,
-        this
-      );
+      return Result.Err(this);
     } else {
       return Result.Ok([...this._xs]);
     }
@@ -204,6 +201,15 @@ export class ArrayVecIter<T> implements Iterator<Option<T>> {
         value: this.v.get(index)
       };
     }
+  }
+}
+
+export class CapacityError<T> extends Error {
+  element: T;
+
+  constructor(element: T) {
+    super("CapacityError: insufficient capacity");
+    this.element = element;
   }
 }
 
