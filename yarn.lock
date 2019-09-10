@@ -1025,10 +1025,12 @@
     once "^1.4.0"
     universal-user-agent "^4.0.0"
 
-"@rusts/std@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@rusts/std/-/std-0.1.0.tgz#824b61b31a5253b567798edbcac18097cfd5834f"
-  integrity sha512-FNQnkDDc6zzpdYA4RpIP/+KfOxnNsoIomIqlEk85w9gOVuUhz+1KQVBoBHr3D3mVCaa2Ap1RJsCwEtT6e9yBOA==
+"@rusts/std@^0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@rusts/std/-/std-0.1.1.tgz#39736bd7f4cc20cd91b1df1913769f24c53a37eb"
+  integrity sha512-xUt/+/LQqPKqF2K/+8fYi/ZxCTZ385fFjiLIJAG22WZ1osxzayhtyc1L44Uc0rV7emhxT5TO2xiRJSqWtJPbKQ==
+  dependencies:
+    copy-anything "^1.5.0"
 
 "@samverschueren/stream-to-observable@^0.3.0":
   version "0.3.0"
@@ -2308,6 +2310,13 @@ convert-source-map@^1.1.0, convert-source-map@^1.4.0:
   integrity sha512-eFu7XigvxdZ1ETfbgPBohgyQ/Z++C0eEhTor0qRwBw9unw+L0/6V8wkSuGgzdThkiS5lSpdptOQPD8Ak40a+7A==
   dependencies:
     safe-buffer "~5.1.1"
+
+copy-anything@^1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/copy-anything/-/copy-anything-1.5.0.tgz#26bbbd25c711688194253a64df988e720a992910"
+  integrity sha512-veu74zguz1JFaRbGNEoB+/qBsgQ7h6y9dxEfGgf1xdOdX+13BYREGa6jn490rzeTiIAKYQHgrFwk2nuIF4YZXA==
+  dependencies:
+    is-what "^3.2.4"
 
 copy-concurrently@^1.0.0:
   version "1.0.5"
@@ -4179,6 +4188,11 @@ is-utf8@^0.2.1:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/is-utf8/-/is-utf8-0.2.1.tgz#4b0da1442104d1b336340e80797e865cf39f7d72"
   integrity sha1-Sw2hRCEE0bM2NA6AeX6GXPOffXI=
+
+is-what@^3.2.4:
+  version "3.3.1"
+  resolved "https://registry.yarnpkg.com/is-what/-/is-what-3.3.1.tgz#79502181f40226e2d8c09226999db90ef7c1bcbe"
+  integrity sha512-seFn10yAXy+yJlTRO+8VfiafC+0QJanGLMPTBWLrJm/QPauuchy0UXh8B6H5o9VA8BAzk0iYievt6mNp6gfaqA==
 
 is-windows@^1.0.1, is-windows@^1.0.2:
   version "1.0.2"
