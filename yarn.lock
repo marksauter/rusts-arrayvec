@@ -1025,10 +1025,10 @@
     once "^1.4.0"
     universal-user-agent "^4.0.0"
 
-"@rusts/std@^0.1.1":
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/@rusts/std/-/std-0.1.1.tgz#39736bd7f4cc20cd91b1df1913769f24c53a37eb"
-  integrity sha512-xUt/+/LQqPKqF2K/+8fYi/ZxCTZ385fFjiLIJAG22WZ1osxzayhtyc1L44Uc0rV7emhxT5TO2xiRJSqWtJPbKQ==
+"@rusts/std@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@rusts/std/-/std-0.1.2.tgz#4b4b7efb7a9cd097a5ca87185127563c34347811"
+  integrity sha512-GZ/epuf/yqpnXdacu8dRnSlTa0U/hUokbLt8a4C4BqOFHoekSg/JU+E1daQipMTmiwdTh5CPksMHXGkV2aiIAg==
   dependencies:
     copy-anything "^1.5.0"
 
