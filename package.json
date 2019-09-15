@@ -115,6 +115,6 @@
     "typescript": "^3.6.3"
   },
   "dependencies": {
-    "@rusts/std": "^0.1.3-a"
+    "@rusts/std": "^0.1.6"
   }
 }
