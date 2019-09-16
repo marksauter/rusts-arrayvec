@@ -271,7 +271,7 @@ export class ArrayVec<T> implements Eq<ArrayVec<T>>, Ord<ArrayVec<T>>, Debug, Cl
   }
 }
 
-export class ArrayVecIter<T> implements Iterator<Option<T>> {
+export class ArrayVecIter<T> implements Iterator<T> {
   index: number;
   v: ArrayVec<T>;
 
@@ -280,19 +280,22 @@ export class ArrayVecIter<T> implements Iterator<Option<T>> {
     this.v = v;
   }
 
-  next(): IteratorResult<Option<T>> {
+  // Return the next value in the iterator
+  // Note: returning as type T to avoid returning as Option<T>
+  next(): IteratorResult<T> {
     if (this.index === this.v.len()) {
       return {
         done: true,
-        value: None()
+        // This is needed to satisfy the IteratorResult<T> type
+        value: (undefined as unknown) as T
       };
     } else {
-      let index = this.index;
+      let value = this.v.get(this.index);
       this.index += 1;
-      return {
-        done: false,
-        value: this.v.get(index)
-      };
+      return value.map_or<{ done: boolean; value: T }>(
+        { done: true, value: (undefined as unknown) as T },
+        (t: T) => ({ done: false, value: t })
+      );
     }
   }
 }

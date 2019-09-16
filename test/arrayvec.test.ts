@@ -17,7 +17,7 @@ describe("ArrayVec", () => {
 
     for (let elt of vec) {
       assert_eq(
-        elt.unwrap().reduce((acc: number, v: number) => {
+        elt.reduce((acc: number, v: number) => {
           return (acc += v);
         }),
         10
