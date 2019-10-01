@@ -1,4 +1,4 @@
-import { test as test_macros } from "@rusts/std";
+import { test as test_macros, add, None, Some } from "@rusts/std";
 import { ArrayVec } from "../src/arrayvec";
 import { Range, Less, Equal, Greater } from "@rusts/std";
 const { assert, assert_eq, should_panic } = test_macros;
@@ -16,13 +16,14 @@ describe("ArrayVec", () => {
     vec.push([-1, 13, -2]);
 
     for (let elt of vec) {
-      assert_eq(
-        elt.reduce((acc: number, v: number) => {
-          return (acc += v);
-        }),
-        10
-      );
+      assert_eq(elt.iter().fold(0, add), 10);
     }
+
+    let sum_len = vec
+      .into_iter()
+      .map((x: number[]) => x.len())
+      .fold(0, add);
+    assert_eq(sum_len, 8);
   });
 
   test("from", () => {
@@ -30,8 +31,18 @@ describe("ArrayVec", () => {
 
     assert_eq(vec.len(), 3);
     assert_eq(vec.capacity(), 3);
-    assert_eq(vec.as_array(), [0, 1, 2]);
+    assert_eq(vec.as_slice(), [0, 1, 2]);
     assert_eq(vec.into_inner().unwrap(), [0, 1, 2]);
+  });
+
+  test("iter", () => {
+    let iter = ArrayVec.from([1, 2, 3]).into_iter();
+    assert_eq(iter.size_hint(), [3, Some(3)]);
+    assert_eq(iter.next_back(), Some(3));
+    assert_eq(iter.next(), Some(1));
+    assert_eq(iter.next_back(), Some(2));
+    assert_eq(iter.size_hint(), [0, Some(0)]);
+    assert_eq(iter.next_back(), None());
   });
 
   test("eq", () => {
@@ -92,7 +103,7 @@ describe("ArrayVec", () => {
   test("clear", () => {
     let v = ArrayVec.from([0, 0, 0, 0, 0, 0, 0, 0]);
     v.clear();
-    assert_eq(v.as_array(), []);
+    assert_eq(v.as_slice(), []);
   });
 
   test("truncate", () => {
@@ -105,20 +116,20 @@ describe("ArrayVec", () => {
     let v = ArrayVec.from([0, 0, 0, 0, 0, 0, 0, 0]);
     v.pop();
     v.drain(new Range(0, 7));
-    assert_eq(v.as_array(), []);
+    assert_eq(v.as_slice(), []);
   });
 
   test("retain", () => {
     let v = ArrayVec.from([0, 1, 2, 3, 4, 5, 6, 7]);
     v.retain(() => true);
-    assert_eq(v.as_array(), [0, 1, 2, 3, 4, 5, 6, 7]);
+    assert_eq(v.as_slice(), [0, 1, 2, 3, 4, 5, 6, 7]);
     v.retain((elt, i) => {
       v.set(i, Math.floor(elt / 2));
       return v.get(i).unwrap() % 2 === 0;
     });
-    assert_eq(v.as_array(), [0, 0, 2, 2]);
+    assert_eq(v.as_slice(), [0, 0, 2, 2]);
     v.retain(() => false);
-    assert_eq(v.as_array(), []);
+    assert_eq(v.as_slice(), []);
   });
 
   test("drain_oob", () => {
@@ -137,18 +148,18 @@ describe("ArrayVec", () => {
   });
 
   test("insert", () => {
-    let v: ArrayVec<number> = ArrayVec.from([]);
+    let v: ArrayVec<number> = ArrayVec.from<number>([]);
     assert(v.try_push(1).is_err());
 
     v = new ArrayVec(3);
     v.insert(0, 0);
     v.insert(1, 1);
-    assert_eq(v.as_array(), [0, 1]);
+    assert_eq(v.as_slice(), [0, 1]);
     v.insert(2, 2);
-    assert_eq(v.as_array(), [0, 1, 2]);
+    assert_eq(v.as_slice(), [0, 1, 2]);
 
     let ret2 = v.try_insert(1, 9);
-    assert_eq(v.as_array(), [0, 1, 2]);
+    assert_eq(v.as_slice(), [0, 1, 2]);
     assert(ret2.is_err());
 
     v = ArrayVec.from([2]);
@@ -192,7 +203,7 @@ describe("ArrayVec", () => {
 
     assert_eq(v.remove(1), "b");
     assert_eq(v.remove(1), "c");
-    assert_eq(v.as_array(), ["a", "d"]);
+    assert_eq(v.as_slice(), ["a", "d"]);
   });
 
   test("remove_oob", () => {
@@ -218,7 +229,7 @@ describe("ArrayVec", () => {
     assert_eq(v.pop_at(1).unwrap(), "b");
     assert_eq(v.pop_at(1).unwrap(), "c");
     assert(v.pop_at(2).is_none());
-    assert_eq(v.as_array(), ["a", "d"]);
+    assert_eq(v.as_slice(), ["a", "d"]);
   });
 
   test("swap_remove", () => {
@@ -232,7 +243,7 @@ describe("ArrayVec", () => {
     assert_eq(v.swap_remove(1), "b");
     assert_eq(v.swap_remove(1), "e");
     assert_eq(v.swap_remove(1), "d");
-    assert_eq(v.as_array(), ["a", "c"]);
+    assert_eq(v.as_slice(), ["a", "c"]);
   });
 
   test("swap_remove_oob", () => {
@@ -261,6 +272,21 @@ describe("ArrayVec", () => {
     assert_eq(v.swap_pop(1).unwrap(), "e");
     assert_eq(v.swap_pop(1).unwrap(), "d");
     assert(v.swap_pop(3).is_none());
-    assert_eq(v.as_array(), ["a", "c"]);
+    assert_eq(v.as_slice(), ["a", "c"]);
+  });
+
+  test("insert_at_length", () => {
+    let v = new ArrayVec<string>(8);
+    let result1 = v.try_insert(0, "a");
+    let result2 = v.try_insert(1, "b");
+    assert(result1.is_ok() && result2.is_ok());
+    assert_eq(v.as_slice(), ["a", "b"]);
+  });
+
+  test("insert_out_of_bounds", () => {
+    let v = new ArrayVec<string>(8);
+    should_panic(() => {
+      v.try_insert(1, "test");
+    });
   });
 });

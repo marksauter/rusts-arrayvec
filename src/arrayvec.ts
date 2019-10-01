@@ -1,5 +1,9 @@
 import {
+  // Self
+  Self,
+  // Range
   Range,
+  range,
   // Option
   Option,
   None,
@@ -8,27 +12,37 @@ import {
   Result,
   Ok,
   Err,
+  // Iterator
+  ExactSizeAndDoubleEndedIterator,
+  IntoIterator,
   // traits
   Clone,
   Debug,
-  Eq,
-  Ord,
+  ImplPartialEq,
+  ImplEq,
+  ImplPartialOrd,
+  ImplOrd,
   // Ordering
   Ordering,
   // funtions
   clone,
   cmp,
+  partial_cmp,
   debug_assert,
   eq,
   format
 } from "@rusts/std";
 
-export class ArrayVec<T> implements Eq<ArrayVec<T>>, Ord<ArrayVec<T>>, Debug, Clone<ArrayVec<T>> {
+export class ArrayVec<T> extends ImplOrd(ImplPartialOrd(ImplEq(ImplPartialEq(Self))))
+  implements Clone, Debug {
+  public Self!: ArrayVec<T>;
+
   private _xs: T[];
   private _capacity: number;
   private _len: number;
 
   constructor(capacity: number) {
+    super();
     this._xs = [];
     this._capacity = capacity;
     this._len = 0;
@@ -66,11 +80,17 @@ export class ArrayVec<T> implements Eq<ArrayVec<T>>, Ord<ArrayVec<T>>, Debug, Cl
     return None();
   }
 
+  public get_unchecked(index: number) {
+    let len = this.len();
+    debug_assert(index >= 0 && index < len);
+    return this._xs[index];
+  }
+
   public set(index: number, element: T) {
     this.try_set(index, element).unwrap();
   }
 
-  public try_set(index: number, element: T): Result<void, string> {
+  public try_set(index: number, element: T): Result<undefined, string> {
     let len = this.len();
     if (index >= 0 && index < len) {
       this.set_unchecked(index, element);
@@ -86,12 +106,16 @@ export class ArrayVec<T> implements Eq<ArrayVec<T>>, Ord<ArrayVec<T>>, Debug, Cl
     this._xs[index] = element;
   }
 
-  public into_iter(): ArrayVecIter<T> {
-    return new ArrayVecIter(this);
+  public into_iter(): ArrayVecIntoIter<T> {
+    return new ArrayVecIntoIter(this);
   }
 
-  public [Symbol.iterator](): ArrayVecIter<T> {
-    return this.into_iter();
+  public [Symbol.iterator]() {
+    return this.into_iter()[Symbol.iterator]();
+  }
+
+  public slice(start: number, end?: number): T[] {
+    return this._xs.slice(start, end);
   }
 
   public sort(compare: (a: T, b: T) => number) {
@@ -110,7 +134,7 @@ export class ArrayVec<T> implements Eq<ArrayVec<T>>, Ord<ArrayVec<T>>, Debug, Cl
     this.try_push(element).unwrap();
   }
 
-  public try_push(element: T): Result<void, CapacityError<T>> {
+  public try_push(element: T): Result<undefined, CapacityError<T>> {
     if (this.len() < this.capacity()) {
       this.push_unchecked(element);
       return Ok(undefined);
@@ -130,7 +154,7 @@ export class ArrayVec<T> implements Eq<ArrayVec<T>>, Ord<ArrayVec<T>>, Debug, Cl
     this.try_insert(index, element).unwrap();
   }
 
-  public try_insert(index: number, element: T): Result<void, CapacityError<T>> {
+  public try_insert(index: number, element: T): Result<undefined, CapacityError<T>> {
     if (index > this.len() || index < 0) {
       panic_oob("try_insert", index, this.len());
     }
@@ -183,7 +207,7 @@ export class ArrayVec<T> implements Eq<ArrayVec<T>>, Ord<ArrayVec<T>>, Debug, Cl
     if (index >= this.len() || index < 0) {
       return None();
     } else {
-      return Some(this.drain(new Range(index, index + 1))[0]);
+      return Some(this.drain(range(index, index + 1))[0]);
     }
   }
 
@@ -210,7 +234,7 @@ export class ArrayVec<T> implements Eq<ArrayVec<T>>, Ord<ArrayVec<T>>, Debug, Cl
       }
     }
     if (del > 0) {
-      this.drain(new Range(len - del, len));
+      this.drain(range(len - del, len));
     }
   }
 
@@ -235,68 +259,95 @@ export class ArrayVec<T> implements Eq<ArrayVec<T>>, Ord<ArrayVec<T>>, Debug, Cl
     return this._xs.splice(start, end - start);
   }
 
-  public into_inner(): Result<T[], ArrayVec<T>> {
+  public into_inner(): Result<T[], this["Self"]> {
     if (this.len() < this.capacity()) {
-      return Err(this);
+      return Err(this as this["Self"]);
     } else {
       return Ok([...this._xs]);
     }
   }
 
-  public as_array(): T[] {
+  public as_slice(): T[] {
     return [...this._xs];
   }
 
-  public eq(other: ArrayVec<T>): boolean {
-    return eq(this.as_array(), other.as_array());
+  public eq(other: this["Self"]): boolean {
+    return eq(this.as_slice(), other.as_slice());
   }
 
-  public clone(): ArrayVec<T> {
+  // Clone
+  readonly isClone = true;
+
+  // TODO: make this better
+  public clone(): this["Self"] {
     let ret: ArrayVec<T> = new ArrayVec(this.capacity());
     ret._xs = clone(this._xs);
     ret._len = this.len();
     return ret;
   }
 
-  public fmt_debug(): string {
-    return format("{}", this._xs);
-  }
-
   public cmp(other: ArrayVec<T>): Ordering {
-    return cmp(this.as_array(), other.as_array());
+    return cmp(this.as_slice(), other.as_slice());
   }
 
   public partial_cmp(other: ArrayVec<T>): Option<Ordering> {
-    return Some(this.cmp(other));
+    return partial_cmp(this.as_slice(), other.as_slice());
+  }
+
+  // Debug
+  public fmt_debug(): string {
+    return format("{:?}", this._xs);
+  }
+
+  public static default<T>(): ArrayVec<T> {
+    return new ArrayVec(0);
   }
 }
 
-export class ArrayVecIter<T> implements Iterator<T> {
-  index: number;
-  v: ArrayVec<T>;
+export class ArrayVecIntoIter<T> extends ExactSizeAndDoubleEndedIterator {
+  public Self!: ArrayVecIntoIter<T>;
 
-  constructor(v: ArrayVec<T>) {
+  private index: number;
+  private v: ArrayVec<T>;
+
+  public Item!: T;
+
+  public constructor(v: ArrayVec<T>) {
+    super();
     this.index = 0;
     this.v = v;
   }
 
-  // Return the next value in the iterator
-  // Note: returning as type T to avoid returning as Option<T>
-  next(): IteratorResult<T> {
+  public next(): Option<this["Item"]> {
     if (this.index === this.v.len()) {
-      return {
-        done: true,
-        // This is needed to satisfy the IteratorResult<T> type
-        value: (undefined as unknown) as T
-      };
+      return None();
     } else {
-      let value = this.v.get(this.index);
+      let index = this.index;
       this.index += 1;
-      return value.map_or<{ done: boolean; value: T }>(
-        { done: true, value: (undefined as unknown) as T },
-        (t: T) => ({ done: false, value: t })
-      );
+      return Some(this.v.get_unchecked(index));
     }
+  }
+
+  public size_hint(): [number, Option<number>] {
+    let len = this.v.len() - this.index;
+    return [len, Some(len)];
+  }
+
+  public next_back(): Option<this["Item"]> {
+    if (this.index === this.v.len()) {
+      return None();
+    } else {
+      let new_len = this.v.len() - 1;
+      this.v.set_len(new_len);
+      return Some(this.v.get_unchecked(new_len));
+    }
+  }
+
+  // Clone
+  readonly isClone = true;
+
+  public clone(): ArrayVecIntoIter<T> {
+    return new ArrayVecIntoIter(ArrayVec.from(this.v.slice(this.index)));
   }
 }
 
