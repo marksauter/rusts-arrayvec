@@ -1054,10 +1054,10 @@
     once "^1.4.0"
     universal-user-agent "^4.0.0"
 
-"@rusts/std@^0.2.5":
-  version "0.2.5"
-  resolved "https://registry.yarnpkg.com/@rusts/std/-/std-0.2.5.tgz#a393e15bced0b82c79d2167f64eac670682f5278"
-  integrity sha512-b+Ojzae+bJEwcbWnwMyl/kSWCyHojQb6AH+zkXbjbYRy9bqebo7BOufkS9XGuGl4+eADO9vhyxV+TeboiczEzQ==
+"@rusts/std@^0.2.6":
+  version "0.2.6"
+  resolved "https://registry.yarnpkg.com/@rusts/std/-/std-0.2.6.tgz#28ca9bef04c8877773a9b11b5560acda74d890cc"
+  integrity sha512-WZgvxEDy8/7Ovoup+h+xKRITJYiG5vYeVE3uONMy/8fA15AtnIeHlrbwjtegjSQY8ojilIiEMpNsDnzvIalpuw==
   dependencies:
     "@types/lodash.clonedeep" "^4.5.6"
     lodash.clonedeep "^4.5.0"

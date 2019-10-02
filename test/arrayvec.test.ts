@@ -1,6 +1,5 @@
-import { test as test_macros, add, None, Some } from "@rusts/std";
 import { ArrayVec } from "../src/arrayvec";
-import { Range, Less, Equal, Greater } from "@rusts/std";
+import { test_macros, add, None, Some, Range, Less, Equal, Greater } from "@rusts/std";
 const { assert, assert_eq, should_panic } = test_macros;
 
 test("exports ArrayVec", () => {
