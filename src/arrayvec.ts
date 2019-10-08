@@ -110,7 +110,7 @@ export class ArrayVec<T> extends ImplOrd(ImplPartialOrd(ImplEq(ImplPartialEq(Sel
     return new ArrayVecIntoIter(this);
   }
 
-  public [Symbol.iterator]() {
+  public [Symbol.iterator](): Iterator<T> {
     return this.into_iter()[Symbol.iterator]();
   }
 
