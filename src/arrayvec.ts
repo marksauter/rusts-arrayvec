@@ -243,7 +243,7 @@ export class ArrayVec<T> extends ImplOrd(ImplPartialOrd(ImplEq(ImplPartialEq(Sel
     this._len = length;
   }
 
-  public drain(range: Range): T[] {
+  public drain(range: Range<number>): T[] {
     let len = this.len();
     let start = range.start;
     let end = range.end;
@@ -276,8 +276,6 @@ export class ArrayVec<T> extends ImplOrd(ImplPartialOrd(ImplEq(ImplPartialEq(Sel
   }
 
   // Clone
-  readonly isClone = true;
-
   // TODO: make this better
   public clone(): this["Self"] {
     let ret: ArrayVec<T> = new ArrayVec(this.capacity());
@@ -344,8 +342,6 @@ export class ArrayVecIntoIter<T> extends ExactSizeAndDoubleEndedIterator {
   }
 
   // Clone
-  readonly isClone = true;
-
   public clone(): ArrayVecIntoIter<T> {
     return new ArrayVecIntoIter(ArrayVec.from(this.v.slice(this.index)));
   }
