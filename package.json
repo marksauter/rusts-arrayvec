@@ -1,6 +1,6 @@
 {
   "name": "@rusts/arrayvec",
-  "version": "0.1.13",
+  "version": "0.1.14",
   "description": "Rust ArrayVec type for Javascript",
   "keywords": [],
   "main": "dist/arrayvec.umd.js",
