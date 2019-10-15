@@ -1,6 +1,6 @@
 import { ArrayVec } from "../src/arrayvec";
-import { test_macros, add, None, Some, Range, Less, Equal, Greater } from "@rusts/std";
-const { assert, assert_eq, should_panic } = test_macros;
+import { add, None, Some, Range, Less, Equal, Greater } from "@rusts/std";
+const { assert, assert_eq, should_panic } = require("@rusts/std/dist/lib/macros.test");
 
 test("exports ArrayVec", () => {
   expect(ArrayVec).toBeDefined();
