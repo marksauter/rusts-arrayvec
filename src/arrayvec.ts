@@ -14,7 +14,6 @@ import {
   Err,
   // Iterator
   ExactSizeAndDoubleEndedIterator,
-  IntoIterator,
   // traits
   Clone,
   Debug,
@@ -73,6 +72,10 @@ export class ArrayVec<T> extends ImplOrd(ImplPartialOrd(ImplEq(ImplPartialEq(Sel
     return this._capacity;
   }
 
+  public is_empty(): boolean {
+    return this._len === 0;
+  }
+
   public get(index: number): Option<T> {
     if (index >= 0 && index < this.len()) {
       return Some(this._xs[index]);
@@ -104,6 +107,14 @@ export class ArrayVec<T> extends ImplOrd(ImplPartialOrd(ImplEq(ImplPartialEq(Sel
     let len = this.len();
     debug_assert(index >= 0 && index < len);
     this._xs[index] = element;
+  }
+
+  public first(): Option<T> {
+    return this._xs.first();
+  }
+
+  public last(): Option<T> {
+    return this._xs.last();
   }
 
   public into_iter(): ArrayVecIntoIter<T> {
@@ -279,7 +290,7 @@ export class ArrayVec<T> extends ImplOrd(ImplPartialOrd(ImplEq(ImplPartialEq(Sel
   // TODO: make this better
   public clone(): this["Self"] {
     let ret: ArrayVec<T> = new ArrayVec(this.capacity());
-    ret._xs = clone(this._xs);
+    ret._xs = this._xs.clone();
     ret._len = this.len();
     return ret;
   }
